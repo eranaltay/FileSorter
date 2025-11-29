@@ -1,6 +1,7 @@
 import datetime
 from pathlib import Path
 import os
+import shutil
 
 
 def iterate_downloads_folder(log_file):
@@ -29,9 +30,20 @@ def iterate_downloads_folder(log_file):
         log_file.write(f"Downloads folder not found at: {downloads_folder}\n")
 
 def move_file_to_folder(item, folder_name):
-
-    os.makedirs(Path.home() / "Downloads" / folder_name, exist_ok=True)
-    item.rename(Path.home() / "Downloads" / folder_name / item.name)
+    destination_folder = Path.home() / "Downloads" / folder_name
+    destination_path = destination_folder / item.name
+    
+    os.makedirs(destination_folder, exist_ok=True)
+    
+    # If destination file exists, remove it to overwrite
+    if destination_path.exists():
+        if destination_path.is_file():
+            os.remove(destination_path)
+        elif destination_path.is_dir():
+            shutil.rmtree(destination_path)
+    
+    # Move the file to the destination folder
+    shutil.move(str(item), str(destination_path))
 
 
 def HandleFile(log_file, item):
